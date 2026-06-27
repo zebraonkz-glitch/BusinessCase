@@ -8,8 +8,79 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum Visibility {
+  PRIVATE
+  PUBLIC
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+
+  notes Note[]
+  cases Case[]
+  votes Vote[]
+}
+
 model Note {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
+  ownerId   String
   title     String
   createdAt DateTime @default(now())
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
+}
+
+model Category {
+  id       String @id @default(cuid())
+  category String
+
+  cases Case[]
+}
+
+model Case {
+  id          String     @id @default(cuid())
+  ownerId     String
+  title       String
+  content     String
+  description String?
+  categoryId  String
+  visibility  Visibility @default(PRIVATE)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  publishedAt DateTime?
+
+  owner    User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  votes    Vote[]
+  tags     Tag[]
+
+  @@index([ownerId, updatedAt])
+  @@index([visibility, createdAt])
+}
+
+model Tag {
+  id   String @id @default(cuid())
+  name String @unique
+
+  cases Case[]
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  userId    String
+  caseId    String
+  value     Int      @default(1)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, caseId])
+  @@index([caseId])
+  @@index([userId])
 }

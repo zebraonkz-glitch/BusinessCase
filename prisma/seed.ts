@@ -3,15 +3,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  const count = await prisma.note.count();
-  if (count > 0) return;
-
-  await prisma.note.createMany({
-    data: [
-      { title: "Первая заметка из seed" },
-      { title: "Вторая заметка из seed" },
-    ],
-  });
+  console.log("Seed отключён. Используйте: npm run db:verify");
 }
 
 main()
