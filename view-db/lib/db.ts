@@ -4,39 +4,82 @@ export type DbTarget = "local" | "work";
 
 const clients = new Map<DbTarget, PrismaClient>();
 
+function isPlaceholderUrl(url: string): boolean {
+  return (
+    url.includes("USER:PASSWORD") ||
+    url.includes("@localhost:5432/businesscase")
+  );
+}
+
 export function getDbUrl(target: DbTarget): string {
   if (target === "local") {
-    return (
-      process.env.DATABASE_URL_LOCAL ??
-      process.env.DATABASE_URL ??
-      ""
-    );
+    const local = process.env.DATABASE_URL_LOCAL?.trim();
+    if (local && !isPlaceholderUrl(local)) {
+      return local;
+    }
+    if (!local) {
+      return process.env.DATABASE_URL?.trim() ?? "";
+    }
+    return "";
   }
 
-  return (
-    process.env.DATABASE_URL_WORK ??
-    process.env.WORK_DATABASE_URL ??
-    process.env.DATABASE_URL ??
-    ""
-  );
+  const work =
+    process.env.DATABASE_URL_WORK?.trim() ??
+    process.env.WORK_DATABASE_URL?.trim();
+  if (work && !isPlaceholderUrl(work)) {
+    return work;
+  }
+
+  return process.env.DATABASE_URL?.trim() ?? "";
+}
+
+export function isDbConfigured(target: DbTarget): boolean {
+  const url = getDbUrl(target);
+  return Boolean(url) && !isPlaceholderUrl(url);
 }
 
 export function getDbLabel(target: DbTarget): string {
   if (target === "local") {
-    return process.env.DATABASE_URL_LOCAL
-      ? "Локальная БД"
-      : "Локальная БД (DATABASE_URL)";
+    const local = process.env.DATABASE_URL_LOCAL?.trim();
+    if (local && !isPlaceholderUrl(local)) {
+      return "Локальная БД";
+    }
+    if (!local && process.env.DATABASE_URL) {
+      return "Локальная БД (DATABASE_URL)";
+    }
+    return "Локальная БД";
   }
 
-  return process.env.DATABASE_URL_WORK || process.env.WORK_DATABASE_URL
-    ? "Рабочая БД"
-    : "Рабочая БД (DATABASE_URL)";
+  if (
+    (process.env.DATABASE_URL_WORK && !isPlaceholderUrl(process.env.DATABASE_URL_WORK)) ||
+    (process.env.WORK_DATABASE_URL && !isPlaceholderUrl(process.env.WORK_DATABASE_URL))
+  ) {
+    return "Рабочая БД";
+  }
+
+  return "Рабочая БД (DATABASE_URL)";
+}
+
+export function getDbHint(target: DbTarget): string {
+  if (isDbConfigured(target)) {
+    return "Подключение настроено";
+  }
+
+  if (target === "local") {
+    return "Задайте DATABASE_URL_LOCAL или уберите placeholder localhost из .env";
+  }
+
+  return "Задайте DATABASE_URL_WORK в .env";
 }
 
 export function getClient(target: DbTarget): PrismaClient {
   const url = getDbUrl(target);
   if (!url) {
-    throw new Error(`URL для БД «${target}» не задан`);
+    throw new Error(
+      target === "local"
+        ? "Локальная БД не настроена. Укажите DATABASE_URL_LOCAL или удалите placeholder localhost:5432 из .env"
+        : "Рабочая БД не настроена. Укажите DATABASE_URL_WORK в .env",
+    );
   }
 
   if (!clients.has(target)) {

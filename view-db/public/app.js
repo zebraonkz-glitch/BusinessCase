@@ -48,7 +48,7 @@ function navigate(path) {
   location.hash = path;
 }
 
-function renderHome(databases) {
+function renderHome(databases = []) {
   subtitle.textContent = "Выберите базу данных";
   app.innerHTML = `
     <div class="card-grid">
@@ -57,7 +57,7 @@ function renderHome(databases) {
           (db) => `
         <article class="card">
           <h2>${db.label}</h2>
-          <p>${db.configured ? "Подключение настроено" : "URL не задан в .env"}</p>
+          <p>${db.hint ?? (db.configured ? "Подключение настроено" : "URL не задан в .env")}</p>
           <button class="btn" data-db="${db.id}" ${db.configured ? "" : "disabled"}>
             Выбрать
           </button>
@@ -72,7 +72,7 @@ function renderHome(databases) {
   });
 }
 
-function renderTables(db, tables) {
+function renderTables(db, tables = []) {
   subtitle.textContent = `База: ${db}`;
   app.innerHTML = `
     <div class="toolbar">
@@ -164,8 +164,9 @@ function openModal(title, fields, initial, onSubmit) {
 
 function renderTableView(db, table, meta, payload) {
   subtitle.textContent = `${db} → ${table}`;
-  const columns = meta.columns.map((c) => c.name);
-  const pk = meta.primaryKey;
+  const columns = (meta?.columns ?? []).map((c) => c.name);
+  const pk = meta?.primaryKey ?? [];
+  const rows = payload?.rows ?? [];
 
   app.innerHTML = `
     <div class="toolbar">
@@ -181,7 +182,7 @@ function renderTableView(db, table, meta, payload) {
           </tr>
         </thead>
         <tbody>
-          ${payload.rows
+          ${rows
             .map((row) => {
               const pkData = Object.fromEntries(pk.map((k) => [k, row[k]]));
               return `
@@ -205,7 +206,7 @@ function renderTableView(db, table, meta, payload) {
   `;
 
   document.getElementById("create-btn").addEventListener("click", () => {
-    openModal("Создать запись", meta.columns, {}, async (data) => {
+    openModal("Создать запись", meta?.columns ?? [], {}, async (data) => {
       await api(`/api/${db}/tables/${table}`, {
         method: "POST",
         body: JSON.stringify(data),
@@ -218,8 +219,8 @@ function renderTableView(db, table, meta, payload) {
     btn.addEventListener("click", () => {
       const tr = btn.closest("tr");
       const pkData = JSON.parse(tr.dataset.pk);
-      const row = payload.rows.find((r) => pk.every((k) => String(r[k]) === String(pkData[k])));
-      const fields = meta.columns.map((c) => ({
+      const row = rows.find((r) => pk.every((k) => String(r[k]) === String(pkData[k])));
+      const fields = (meta?.columns ?? []).map((c) => ({
         ...c,
         readonly: pk.includes(c.name),
       }));

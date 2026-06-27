@@ -5,8 +5,9 @@ import {
   DbTarget,
   disconnectAll,
   getClient,
+  getDbHint,
   getDbLabel,
-  getDbUrl,
+  isDbConfigured,
   isValidDbTarget,
   isValidTableName,
 } from "./lib/db";
@@ -33,18 +34,26 @@ function parseDb(param: string): DbTarget {
   if (!isValidDbTarget(param)) {
     throw new Error("Неверный параметр БД");
   }
+  if (!isDbConfigured(param)) {
+    throw new Error(
+      param === "local"
+        ? "Локальная БД не настроена. Запустите PostgreSQL или используйте «Рабочая БД»"
+        : "Рабочая БД не настроена",
+    );
+  }
   return param;
 }
 
 app.get("/api/databases", (_req, res) => {
   const targets: DbTarget[] = ["local", "work"];
-  res.json(
-    targets.map((id) => ({
+  res.json({
+    databases: targets.map((id) => ({
       id,
       label: getDbLabel(id),
-      configured: Boolean(getDbUrl(id)),
+      hint: getDbHint(id),
+      configured: isDbConfigured(id),
     })),
-  );
+  });
 });
 
 app.get("/api/:db/tables", async (req, res) => {
@@ -167,7 +176,11 @@ app.delete("/api/:db/tables/:name", async (req, res) => {
   }
 });
 
-app.get("*", (_req, res) => {
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api")) {
+    next();
+    return;
+  }
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 

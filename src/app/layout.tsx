@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "BusinessCase — Notes",
-  description: "Минимальный Next.js + Prisma + Neon",
+  title: "BusinessCase — Case Store",
+  description: "SaaS-платформа для промтов и бизнес-кейсов",
 };
 
 export default function RootLayout({
