@@ -11,14 +11,14 @@ export default async function MyPromptsPage() {
     <main className="page">
       <header className="page-header">
         <div>
-          <h1>Мои промты</h1>
+          <h1>Мои кейсы</h1>
           <p className="muted">Приватные видны только вам</p>
         </div>
         <SignOutButton />
       </header>
 
       {prompts.length === 0 ? (
-        <p className="muted">Промтов пока нет.</p>
+        <p className="muted">Кейсов пока нет.</p>
       ) : (
         <ul className="list">
           {prompts.map((prompt) => (
