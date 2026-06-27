@@ -14,13 +14,13 @@ export default async function HomePage() {
   return (
     <main>
       <h1>Business Case</h1>
-      <p className="subtitle">Case Store — промты и бизнес-кейсы</p>
+      <p className="subtitle">Case Store — бизнес-кейсы</p>
 
       <nav className="nav-links" style={{ marginBottom: "1.5rem" }}>
         {session?.user ? (
           <>
             <Link href="/dashboard">Личный кабинет</Link>
-            <Link href="/my-prompts">Мои промты</Link>
+            <Link href="/my-prompts">Мои кейсы</Link>
           </>
         ) : (
           <Link href="/login">Войти</Link>

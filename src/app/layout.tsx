@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "BusinessCase — Case Store",
-  description: "SaaS-платформа для промтов и бизнес-кейсов",
+  description: "SaaS-платформа для бизнес-кейсов",
 };
 
 export default function RootLayout({
