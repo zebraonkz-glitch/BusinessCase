@@ -17,7 +17,7 @@ type DashboardSidebarProps = {
 };
 
 const navItems = [
-  { href: "/dashboard", label: "Промпты", icon: MessageSquare },
+  { href: "/dashboard", label: "Кейсы", icon: MessageSquare },
   { href: "/dashboard/favorites", label: "Избранное", icon: Bookmark },
   { href: "/dashboard/history", label: "История", icon: History },
   { href: "/dashboard/settings", label: "Настройки", icon: Settings },
