@@ -24,7 +24,7 @@ export default async function DashboardPage() {
           <img src={session.user.image} alt="" className="avatar" width={48} height={48} />
         )}
         <nav className="nav-links">
-          <Link href="/my-prompts">Мои промты</Link>
+          <Link href="/my-prompts">Мои кейсы</Link>
           <Link href="/">На главную</Link>
         </nav>
       </section>
