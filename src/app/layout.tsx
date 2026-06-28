@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "BusinessCase — Case Store",
-  description: "SaaS-платформа для бизнес-кейсов",
+  title: "Business Case — Case Store",
+  description: "Платформа для обмена бизнес-кейсами",
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body>{children}</body>
+      <body className="min-h-screen antialiased">{children}</body>
     </html>
   );
 }

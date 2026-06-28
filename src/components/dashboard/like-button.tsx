@@ -10,12 +10,14 @@ type LikeButtonProps = {
   promptId: string;
   initialLiked: boolean;
   initialCount: number;
+  loginRedirect?: string;
 };
 
 export function LikeButton({
   promptId,
   initialLiked,
   initialCount,
+  loginRedirect = "/dashboard/public",
 }: LikeButtonProps) {
   const router = useRouter();
   const [liked, setLiked] = useState(initialLiked);
@@ -47,7 +49,7 @@ export function LikeButton({
       if (res.status === 401) {
         setLiked(prevLiked);
         setCount(prevCount);
-        router.push("/login?callbackUrl=/dashboard/public");
+        router.push(`/login?callbackUrl=${encodeURIComponent(loginRedirect)}`);
         return;
       }
 

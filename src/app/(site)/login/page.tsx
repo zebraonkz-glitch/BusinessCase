@@ -2,14 +2,22 @@ import { signIn } from "@/auth";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
-export default async function LoginPage() {
+type PageProps = {
+  searchParams: Promise<{ callbackUrl?: string }>;
+};
+
+export default async function LoginPage({ searchParams }: PageProps) {
   const session = await auth();
+  const { callbackUrl } = await searchParams;
+
   if (session?.user) {
-    redirect("/dashboard");
+    redirect(callbackUrl ?? "/dashboard");
   }
 
+  const redirectTo = callbackUrl ?? "/dashboard";
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+    <div className="flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
         <h1 className="text-2xl font-bold text-slate-900">Вход</h1>
         <p className="mt-2 text-slate-500">Business Case — Case Store</p>
@@ -17,7 +25,7 @@ export default async function LoginPage() {
         <form
           action={async () => {
             "use server";
-            await signIn("google", { redirectTo: "/dashboard" });
+            await signIn("google", { redirectTo });
           }}
           className="mt-8"
         >
@@ -29,6 +37,6 @@ export default async function LoginPage() {
           </button>
         </form>
       </div>
-    </main>
+    </div>
   );
 }
