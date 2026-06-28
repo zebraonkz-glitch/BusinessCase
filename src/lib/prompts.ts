@@ -3,13 +3,36 @@ import { prisma } from "@/lib/prisma";
 
 const PAGE_SIZE = 10;
 
+export type PromptSort = "popular" | "recent";
+
 export type PromptListParams = {
   page?: number;
   search?: string;
+  sort?: PromptSort;
+};
+
+export type PublicPromptItem = {
+  id: string;
+  userId: string;
+  title: string;
+  content: string;
+  isPublic: boolean;
+  isFavorite: boolean;
+  likesCount: number;
+  likedByMe: boolean;
+  createdAt: Date;
 };
 
 export type PromptListResult = {
   items: Awaited<ReturnType<typeof prisma.prompt.findMany>>;
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
+export type PublicPromptListResult = {
+  items: PublicPromptItem[];
   total: number;
   page: number;
   pageSize: number;
@@ -92,11 +115,13 @@ export async function getFavoritePrompts(
   };
 }
 
-/** Все публичные кейсы */
+/** Публичные кейсы с лайками, likedByMe и сортировкой */
 export async function getPublicPrompts(
   params: PromptListParams = {},
-): Promise<PromptListResult> {
+  currentUserId?: string,
+): Promise<PublicPromptListResult> {
   const page = Math.max(1, params.page ?? 1);
+  const sort = params.sort ?? "recent";
   const searchFilter = buildSearchFilter(params.search);
 
   const where: Prisma.PromptWhereInput = {
@@ -104,21 +129,48 @@ export async function getPublicPrompts(
     ...searchFilter,
   };
 
+  const orderBy: Prisma.PromptOrderByWithRelationInput[] =
+    sort === "popular"
+      ? [{ likes: { _count: "desc" } }, { createdAt: "desc" }]
+      : [{ createdAt: "desc" }];
+
   const [total, items] = await Promise.all([
     prisma.prompt.count({ where }),
     prisma.prompt.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy,
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
       include: {
         user: { select: { id: true, name: true, image: true } },
+        _count: { select: { likes: true } },
+        ...(currentUserId
+          ? {
+              likes: {
+                where: { userId: currentUserId },
+                select: { id: true },
+                take: 1,
+              },
+            }
+          : {}),
       },
     }),
   ]);
 
   return {
-    items,
+    items: items.map((item) => ({
+      id: item.id,
+      userId: item.userId,
+      title: item.title,
+      content: item.content,
+      isPublic: item.isPublic,
+      isFavorite: item.isFavorite,
+      likesCount: item._count.likes,
+      likedByMe: currentUserId
+        ? "likes" in item && Array.isArray(item.likes) && item.likes.length > 0
+        : false,
+      createdAt: item.createdAt,
+    })),
     total,
     page,
     pageSize: PAGE_SIZE,

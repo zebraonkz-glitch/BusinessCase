@@ -11,4 +11,5 @@ export type PromptFormValues = z.infer<typeof promptFormSchema>;
 export const searchSchema = z.object({
   q: z.string().trim().max(100).optional(),
   page: z.coerce.number().int().min(1).default(1),
+  sort: z.enum(["popular", "recent"]).default("recent"),
 });

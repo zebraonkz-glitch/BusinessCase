@@ -19,6 +19,7 @@ import {
   updatePrompt,
 } from "@/actions/prompts";
 import { PromptDialog } from "@/components/dashboard/prompt-dialog";
+import { LikeButton } from "@/components/dashboard/like-button";
 import { cn } from "@/lib/utils";
 
 export type PromptItem = {
@@ -28,12 +29,15 @@ export type PromptItem = {
   content: string;
   isPublic: boolean;
   isFavorite: boolean;
+  likesCount?: number;
+  likedByMe?: boolean;
 };
 
 type PromptCardProps = {
   prompt: PromptItem;
   currentUserId: string;
   onEdit?: (prompt: PromptItem) => void;
+  showLike?: boolean;
 };
 
 function preview(text: string) {
@@ -41,7 +45,7 @@ function preview(text: string) {
   return line.length > 140 ? `${line.slice(0, 140)}…` : line;
 }
 
-export function PromptCard({ prompt, currentUserId, onEdit }: PromptCardProps) {
+export function PromptCard({ prompt, currentUserId, onEdit, showLike }: PromptCardProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [favorite, setFavorite] = useState(prompt.isFavorite);
@@ -89,6 +93,14 @@ export function PromptCard({ prompt, currentUserId, onEdit }: PromptCardProps) {
       </div>
 
       <div className="flex shrink-0 items-center gap-1">
+        {showLike && prompt.isPublic && (
+          <LikeButton
+            promptId={prompt.id}
+            initialLiked={prompt.likedByMe ?? false}
+            initialCount={prompt.likesCount ?? 0}
+          />
+        )}
+
         {isOwner && (
           <Button
             type="button"
@@ -160,10 +172,12 @@ export function PromptCardList({
   prompts,
   currentUserId,
   editable,
+  showLike,
 }: {
   prompts: PromptItem[];
   currentUserId: string;
   editable?: boolean;
+  showLike?: boolean;
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState<PromptItem | null>(null);
@@ -187,6 +201,7 @@ export function PromptCardList({
             prompt={prompt}
             currentUserId={currentUserId}
             onEdit={editable ? setEditing : undefined}
+            showLike={showLike}
           />
         ))}
       </div>

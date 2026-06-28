@@ -7,25 +7,20 @@ import { PromptsView } from "@/components/dashboard/prompts-view";
 import { Button } from "@/components/ui/button";
 
 type PageProps = {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; sort?: string }>;
 };
 
 export default async function PublicPromptsPage({ searchParams }: PageProps) {
   const session = await requireSession();
   const params = searchSchema.parse(await searchParams);
-  const data = await getPublicPrompts({
-    page: params.page,
-    search: params.q,
-  });
-
-  const prompts = data.items.map((item) => ({
-    id: item.id,
-    userId: item.userId,
-    title: item.title,
-    content: item.content,
-    isPublic: item.isPublic,
-    isFavorite: item.isFavorite,
-  }));
+  const data = await getPublicPrompts(
+    {
+      page: params.page,
+      search: params.q,
+      sort: params.sort,
+    },
+    session.user.id,
+  );
 
   return (
     <Suspense fallback={<p className="text-slate-500">Загрузка…</p>}>
@@ -38,11 +33,14 @@ export default async function PublicPromptsPage({ searchParams }: PageProps) {
         <PromptsView
           title="Публичные кейсы"
           subtitle="Публичные кейсы"
-          prompts={prompts}
+          prompts={data.items}
           currentUserId={session.user.id}
           totalPages={data.totalPages}
           page={data.page}
           editable
+          showLike
+          showSort
+          sort={params.sort}
         />
       </div>
     </Suspense>

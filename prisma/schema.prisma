@@ -28,6 +28,7 @@ model User {
   cases    Case[]
   votes    Vote[]
   prompts  Prompt[]
+  likes    Like[]
 }
 
 // Auth.js — привязка OAuth-аккаунтов
@@ -142,8 +143,23 @@ model Prompt {
   updatedAt  DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes Like[]
 
   @@index([userId, updatedAt])
   @@index([isPublic, createdAt])
   @@index([userId, isFavorite])
+}
+
+// Лайк публичного кейса: 1 пользователь = 1 лайк на кейс
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  promptId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, promptId])
+  @@index([promptId])
 }

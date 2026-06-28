@@ -22,6 +22,9 @@ type PromptsViewProps = {
   editable?: boolean;
   showCreate?: boolean;
   publicLink?: boolean;
+  showLike?: boolean;
+  showSort?: boolean;
+  sort?: "popular" | "recent";
 };
 
 export function PromptsView({
@@ -33,6 +36,9 @@ export function PromptsView({
   editable,
   showCreate,
   publicLink,
+  showLike,
+  showSort,
+  sort = "recent",
 }: PromptsViewProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -64,6 +70,13 @@ export function PromptsView({
     router.replace(`?${params.toString()}`);
   };
 
+  const setSort = (nextSort: "popular" | "recent") => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("sort", nextSort);
+    params.delete("page");
+    router.replace(`?${params.toString()}`);
+  };
+
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
@@ -81,14 +94,37 @@ export function PromptsView({
         </div>
       </div>
 
-      <div className="relative mb-6 max-w-md">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-        <Input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Поиск по заголовку или тексту…"
-          className="pl-9"
-        />
+      <div className="mb-6 flex flex-wrap items-center gap-4">
+        <div className="relative max-w-md flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Поиск по заголовку или тексту…"
+            className="pl-9"
+          />
+        </div>
+
+        {showSort && (
+          <div className="flex rounded-lg border border-slate-200 bg-white p-1">
+            <Button
+              type="button"
+              variant={sort === "recent" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setSort("recent")}
+            >
+              По дате
+            </Button>
+            <Button
+              type="button"
+              variant={sort === "popular" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setSort("popular")}
+            >
+              По популярности
+            </Button>
+          </div>
+        )}
       </div>
 
       {prompts.length === 0 ? (
@@ -111,6 +147,7 @@ export function PromptsView({
           prompts={prompts}
           currentUserId={currentUserId}
           editable={editable}
+          showLike={showLike}
         />
       )}
 
