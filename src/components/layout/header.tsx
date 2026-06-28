@@ -65,6 +65,9 @@ export async function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
+                  <Link href="/">Главная</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link href="/dashboard">Личный кабинет</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>

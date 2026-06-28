@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Bookmark,
   History,
+  Home,
   MessageSquare,
   Settings,
 } from "lucide-react";
@@ -17,6 +18,7 @@ type DashboardSidebarProps = {
 };
 
 const navItems = [
+  { href: "/", label: "Главная", icon: Home },
   { href: "/dashboard", label: "Кейсы", icon: MessageSquare },
   { href: "/dashboard/favorites", label: "Избранное", icon: Bookmark },
   { href: "/dashboard/history", label: "История", icon: History },
@@ -50,9 +52,11 @@ export function DashboardSidebar({ userName, userImage }: DashboardSidebarProps)
       <nav className="flex flex-1 flex-col gap-1">
         {navItems.map(({ href, label, icon: Icon }) => {
           const active =
-            href === "/dashboard"
-              ? pathname === "/dashboard" || pathname === "/dashboard/public"
-              : pathname.startsWith(href);
+            href === "/"
+              ? false
+              : href === "/dashboard"
+                ? pathname === "/dashboard" || pathname === "/dashboard/public"
+                : pathname.startsWith(href);
 
           return (
             <Link

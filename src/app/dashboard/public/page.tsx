@@ -1,10 +1,10 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { HomeLink } from "@/components/layout/home-link";
 import { requireSession } from "@/lib/session";
 import { getPublicPrompts } from "@/lib/prompts";
 import { searchSchema } from "@/lib/validations/prompt";
 import { PromptsView } from "@/components/dashboard/prompts-view";
-import { Button } from "@/components/ui/button";
 
 type PageProps = {
   searchParams: Promise<{ q?: string; page?: string; sort?: string }>;
@@ -25,10 +25,14 @@ export default async function PublicPromptsPage({ searchParams }: PageProps) {
   return (
     <Suspense fallback={<p className="text-slate-500">Загрузка…</p>}>
       <div>
-        <div className="mb-4">
-          <Button asChild variant="outline" size="sm">
-            <Link href="/dashboard">← Мои кейсы</Link>
-          </Button>
+        <div className="mb-4 flex flex-wrap gap-3">
+          <HomeLink />
+          <Link
+            href="/dashboard"
+            className="text-sm text-sky-600 hover:underline"
+          >
+            ← Мои кейсы
+          </Link>
         </div>
         <PromptsView
           title="Публичные кейсы"

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { HomeLink } from "@/components/layout/home-link";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -79,6 +80,9 @@ export function PromptsView({
 
   return (
     <div>
+      <p className="mb-4">
+        <HomeLink />
+      </p>
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Личный кабинет</h1>

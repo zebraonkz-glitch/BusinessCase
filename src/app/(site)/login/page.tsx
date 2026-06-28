@@ -1,6 +1,7 @@
 import { signIn } from "@/auth";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 type PageProps = {
   searchParams: Promise<{ callbackUrl?: string }>;
@@ -36,6 +37,12 @@ export default async function LoginPage({ searchParams }: PageProps) {
             Войти через Google
           </button>
         </form>
+
+        <p className="mt-6">
+          <Link href="/" className="text-sm text-sky-600 hover:underline">
+            ← На главную
+          </Link>
+        </p>
       </div>
     </div>
   );

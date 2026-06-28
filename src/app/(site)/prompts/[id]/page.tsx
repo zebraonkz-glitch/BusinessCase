@@ -31,7 +31,10 @@ export default async function PromptPage({ params }: PageProps) {
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <div className="mb-6">
+      <div className="mb-6 flex flex-wrap gap-2">
+        <Button asChild variant="outline" size="sm">
+          <Link href="/">← Главная</Link>
+        </Button>
         <Button asChild variant="outline" size="sm">
           <Link href="/catalog">← Каталог</Link>
         </Button>
