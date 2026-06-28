@@ -20,7 +20,7 @@ export default async function HomePage() {
             Business Case
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
-            Платформа для обмена бизнес-кейсами и промтами. Изучайте лучшие
+            Платформа для обмена бизнес-кейсами. Изучайте лучшие
             практики и делитесь своим опытом.
           </p>
 
